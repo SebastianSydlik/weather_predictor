@@ -1,0 +1,64 @@
+###all commands in bash
+
+#listing docker networks
+docker network ls
+
+#listing (only) running containers
+docker ps
+
+#removing docker container
+docker rm pg-network
+
+#starting postgres from docker
+    #including mounting using -v
+
+docker run -it \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="weather" \
+    -v $(pwd)/weather_postgres_data:/var/lib/postgresql/data \
+    -p 5432:5432 \
+    postgres:13
+
+#communicating with postgres
+pgcli -h localhost -u root -p 5432 -d weather
+
+#SQL commands
+SELECT count(1) FROM weather_data
+SELECT max(wind_speed_100m), min(wind_speed_100m) FROM weather_data
+SELECT * FROM weather_data
+
+#PGAdmin
+#pulling the image
+docker pull dpage/pgadmin4
+#installing and using it
+docker run -it \
+    -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+    -e PGADMIN_DEFAULT_PASSWORD="root" \
+    -p 8080:80 \
+    dpage/pgadmin4
+
+#creating a Docker network and running postgres and PGAdmin in it together
+docker network create pg-network
+
+docker run -it \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="weather" \
+    -v $(pwd)/weather_postgres_data:/var/lib/postgresql/data \
+    -p 5432:5432 \
+    --network=pg-network \
+    --name pg-database \
+    postgres:13
+
+docker run -it \
+    -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+    -e PGADMIN_DEFAULT_PASSWORD="root" \
+    -p 8080:80 \
+    --network=pg-network \
+    --name pg-admin \
+    dpage/pgadmin4
+
+
+#convert .ipynb to .py file
+jupyter nbconvert --to=script get_data.ipynb to script
