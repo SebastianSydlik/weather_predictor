@@ -1,9 +1,9 @@
 FROM python:3.9
 
-RUN pip install pandas
+RUN pip install pandas sqlalchemy psycopg2 openmeteo_requests requests_cache retry_requests
 
 WORKDIR /app
 
-COPY pipeline.py pipeline.py
+COPY get_data.py get_data.py
 
-ENTRYPOINT [ "python", "pipeline.py" ]
+ENTRYPOINT [ "python", "get_data.py" ]

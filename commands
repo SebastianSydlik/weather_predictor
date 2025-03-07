@@ -62,3 +62,24 @@ docker run -it \
 
 #convert .ipynb to .py file
 jupyter nbconvert --to=script get_data.ipynb to script
+
+# running the get_data.py ingestion script
+python get_data.py \
+    --user=root \
+    --password=root \
+    --host=localhost \
+    --port=5432 \
+    --db=weather \
+    --table_name=weather_data \
+
+# dockerize ingestion script
+docker build -t weather_ingest:v001 .
+docker run -it \
+    --network=pg-network \
+    weather_ingest:v001 \
+    --user=root \
+    --password=root \
+    --host=pg-database \
+    --port=5432 \
+    --db=weather \
+    --table_name=weather_data
