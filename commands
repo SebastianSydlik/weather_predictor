@@ -83,3 +83,7 @@ docker run -it \
     --port=5432 \
     --db=weather \
     --table_name=weather_data
+
+# docker-compose commands
+docker compose up -d
+docker compose down -v
