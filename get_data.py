@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 import openmeteo_requests
-
+import argparse
 import requests_cache
 import pandas as pd
+
 from retry_requests import retry
 from sqlalchemy import create_engine
-import argparse
+from prefect import flow, task
 
+@task(log_prints=True)
 def main(params):
 	user = params.user
 	password = params.password
@@ -16,13 +18,20 @@ def main(params):
 	db = params.db
 	table_name = params.table_name
 
-	df = get_data_from_api()
-
+	df_raw = get_data_from_api()
+	df = transform_data(df_raw)
 	engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
 	engine.connect()
 	print(df.to_sql(name=f'{table_name}', con=engine, if_exists='replace'))
 
+@task(log_prints=True)
+def transform_data(df):
+	print(f'\npre: nan Count:\n{df.isnull().sum()}')
+	df_clean = df.dropna()
+	print(f'\npost: nan Count:\n{df_clean.isnull().sum()}')
+	return df_clean
 
+@task(log_prints=True, retries=3)
 def get_data_from_api():
 	# Setup the Open-Meteo API client with cache and retry on error
 	cache_session = requests_cache.CachedSession('.cache', expire_after = -1)
@@ -72,7 +81,8 @@ def get_data_from_api():
 	df = pd.DataFrame(data = hourly_data)
 	return df
 
-if __name__ == '__main__':
+@flow(name='ingest_Flow')
+def call_main(): 
 	parser = argparse.ArgumentParser(description='Ingest latest weather data to Postgres')
 	parser.add_argument('--user', help ='user name for postgres')
 	parser.add_argument('--password', help='password for postgres')
@@ -83,3 +93,6 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 	main(args)
+
+if __name__ == '__main__':
+	call_main()
