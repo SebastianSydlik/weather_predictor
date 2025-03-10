@@ -12,20 +12,13 @@ from prefect_sqlalchemy import SqlAlchemyConnector
 
 @task(log_prints=True)
 def main(params):
-	user = params.user
-	password = params.password
-	host = params.host
-	port = params.port
-	db = params.db
 	table_name = params.table_name
 
 	df_raw = get_data_from_api()
 	df = transform_data(df_raw)
-	# connection_block = SqlAlchemyConnector.load("sql0")
-	# with connection_block.get_connection(begin=False) as engine: 
-	engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
-	engine.connect()
-	print(df.to_sql(name=f'{table_name}', con=engine, if_exists='replace'))
+	connection_block = SqlAlchemyConnector.load("sql0")
+	with connection_block.get_connection(begin=False) as engine: 
+		print(df.to_sql(name=f'{table_name}', con=engine, if_exists='replace'))
 
 @task(log_prints=True)
 def transform_data(df):
@@ -87,11 +80,6 @@ def get_data_from_api():
 @flow(name='ingest_Flow')
 def call_main(): 
 	parser = argparse.ArgumentParser(description='Ingest latest weather data to Postgres')
-	parser.add_argument('--user', help ='user name for postgres')
-	parser.add_argument('--password', help='password for postgres')
-	parser.add_argument('--host', help='host for postgres')
-	parser.add_argument('--port', help='port for postgres')
-	parser.add_argument('--db', help='database name for postgres')
 	parser.add_argument('--table_name', help='name of the table where we will write the results to')
 
 	args = parser.parse_args()
