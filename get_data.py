@@ -8,6 +8,7 @@ import pandas as pd
 from retry_requests import retry
 from sqlalchemy import create_engine
 from prefect import flow, task
+from prefect_sqlalchemy import SqlAlchemyConnector
 
 @task(log_prints=True)
 def main(params):
@@ -20,6 +21,8 @@ def main(params):
 
 	df_raw = get_data_from_api()
 	df = transform_data(df_raw)
+	# connection_block = SqlAlchemyConnector.load("sql0")
+	# with connection_block.get_connection(begin=False) as engine: 
 	engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
 	engine.connect()
 	print(df.to_sql(name=f'{table_name}', con=engine, if_exists='replace'))

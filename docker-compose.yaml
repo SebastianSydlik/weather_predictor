@@ -1,5 +1,5 @@
 services:
-  pgdatabase:
+  pgdatabase: #name of the database that is required in pgadmin when registering the server
     image: postgres:13
     environment:
       - POSTGRES_USER=root
@@ -16,3 +16,20 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=root
     ports:
       - "8080:80"
+  prefect-server:
+    image: prefecthq/prefect
+    environment:
+      - PREFECT_SERVER_DATABASE_URL=postgresql+psycopg2://root:root@pgdatabase:5432/weather
+      - PREFECT_SERVER_UI_ENABLED=true
+    ports:
+      - "4200:4200"  # Port for Prefect UI
+    depends_on:
+      - pgdatabase
+    restart: always
+
+  prefect-agent:
+    image: prefecthq/prefect
+    command: prefect agent start --label default
+    depends_on:
+      - prefect-server
+    restart: always

@@ -70,7 +70,7 @@ python get_data.py \
     --host=localhost \
     --port=5432 \
     --db=weather \
-    --table_name=weather_data \
+    --table_name=weather_data
 
 # dockerize ingestion script
 docker build -t weather_ingest:v001 .
@@ -87,3 +87,12 @@ docker run -it \
 # docker-compose commands
 docker compose up -d
 docker compose down -v
+
+#running prefect
+prefect server start
+
+#validating prefect ui server
+echo $PREFECT_API_URL
+
+#setting prefect UI
+export PREFECT_API_URL="http://127.0.0.1:4200/api"
