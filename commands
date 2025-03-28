@@ -88,15 +88,17 @@ docker run -it \
     --db=weather \
     --table_name=weather_data
 
-# docker-compose commands
+# docker-compose commands; note that it may take a moment for the prefect ui to be reachable - refresh the webpage
 docker compose up -d
 docker compose down -v
 
-#running prefect
-prefect server start
+#shorten bash path prompt
+export PS1=">"
 
-#validating prefect ui server
-echo $PREFECT_API_URL
-
-#setting prefect UI
-export PREFECT_API_URL="http://127.0.0.1:4200/api"
+#debugging prefect container
+docker ps | grep server
+docker exec -it <docker id> bash
+#in docker container:
+apt update
+apt install net-tools
+netstat -tulnp | grep 4200

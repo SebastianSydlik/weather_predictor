@@ -11,6 +11,7 @@ numpy = "*"
 pandas = "*"
 sqlalchemy = "*"
 psycopg2 = "*"
+prefect = "==2.20.17"
 
 [dev-packages]
 ipykernel = "*"

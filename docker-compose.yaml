@@ -17,19 +17,21 @@ services:
     ports:
       - "8080:80"
   prefect-server:
-    image: prefecthq/prefect
+    image: prefecthq/prefect:2.20.17-python3.12
     environment:
-      - PREFECT_SERVER_DATABASE_URL=postgresql+psycopg2://root:root@pgdatabase:5432/weather
-      - PREFECT_SERVER_UI_ENABLED=true
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://root:root@pgdatabase:5432/weather
+      - PREFECT_API_URL=http://0.0.0.0:4200
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_SERVER_API_PORT=4200    
+    command: ["prefect", "server", "start"]
     ports:
       - "4200:4200"  # Port for Prefect UI
     depends_on:
       - pgdatabase
     restart: always
-
-  prefect-agent:
-    image: prefecthq/prefect
-    command: prefect agent start --label default
+  prefect-worker:
+    image: prefecthq/prefect:2.20.17-python3.12
+    command: ["prefect", "worker", "start", "-p", "default"]
     depends_on:
       - prefect-server
     restart: always
