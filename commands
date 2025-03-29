@@ -102,3 +102,6 @@ docker exec -it <docker id> bash
 apt update
 apt install net-tools
 netstat -tulnp | grep 4200
+
+#displaying current prefect settings (helpful to see variables that can be set; must be called from within prefect container if it is running via docker)
+prefect config view --show-defaults
