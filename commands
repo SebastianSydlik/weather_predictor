@@ -73,6 +73,9 @@ python get_data.py \
     --table_name=weather_data
 
 #running the get_data.py ingestion script after addition of prefect block
+#note tha the block needs to be defined within the prefect ui. Also note that
+#while prefect in docker requires asyncpg to communicate with its internal
+#database, it requires psycopg2 in the block to communicate with postgresql.
 python get_data.py \
     --table_name=weather_data
 
@@ -88,7 +91,8 @@ docker run -it \
     --db=weather \
     --table_name=weather_data
 
-# docker-compose commands; note that it may take a moment for the prefect ui to be reachable - refresh the webpage
+# docker-compose commands;note that prefect takes about 10s to start up. 
+# initially the webpage will show an error, althogh the port is already opened.
 docker compose up -d
 docker compose down -v
 
