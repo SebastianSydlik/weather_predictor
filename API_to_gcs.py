@@ -22,6 +22,32 @@ def transform_data(df):
 	print(f'\npost: nan Count:\n{df_clean.isnull().sum()}')
 	return df_clean
 
+@task()
+def check_hourly_continuity(df: pd.DataFrame, date_column: str = 'date'):
+    """
+    Checks if the 'date' column in a DataFrame has a consistent hourly frequency.
+
+    Args:
+        df: The pandas DataFrame with a datetime column.
+        date_column: The name of the datetime column (default is 'date').
+
+    Returns:
+        None. Prints messages indicating any deviations from the hourly frequency.
+    """
+    # Make sure the 'date' column is actually in datetime format
+    df.loc[:, date_column] = pd.to_datetime(df[date_column])
+
+    # Calculate the time difference between consecutive rows
+    time_diffs = df[date_column].diff()
+
+    # The expected difference is one hour
+    expected_delta = pd.Timedelta(hours=1)
+
+    # Check for any differences that are not equal to one hour
+    for i, diff in time_diffs[1:].items(): # Start from the second row
+        if diff != expected_delta:
+            print(f"Potential missing or extra data around index {i}: Difference is {diff}")
+
 @task(log_prints=True)
 def store_data(df, table_name):
 	connection_block = SqlAlchemyConnector.load("postgres-connector")
@@ -70,6 +96,10 @@ def etl_web_to_postgres(params):
 	# ETL steps
 	df_raw = extract_data()
 	df_clean = transform_data(df_raw)
+	hourly_discontinuity = check_hourly_continuity(df_clean)
+	if hourly_discontinuity:
+		print("Missing Data or error in format.")
+		return
 
 	df_existing = load_existing_gcs(gcs_path)
 	df_new = filter_new_entries(df_clean, df_existing)
