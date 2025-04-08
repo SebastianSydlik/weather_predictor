@@ -74,8 +74,13 @@ def write_gcs(path):
 def load_existing_gcs(path: str) -> pd.DataFrame:
     gcs_block = GcsBucket.load("gcs-connector")
     local_path = Path("tmp/prev_data.parquet")
+    local_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure tmp/ exists
+
     try:
-        gcs_block.download_to_path(from_path=path, to_path=local_path)
+        gcs_block.download_object_to_path(
+            from_path=path,
+            to_path=str(local_path)
+        )
         return pd.read_parquet(local_path)
     except Exception as e:
         print(f"Could not load existing data: {e}")
