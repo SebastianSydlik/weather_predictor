@@ -3,22 +3,23 @@ import openmeteo_requests
 import requests_cache
 
 from retry_requests import retry
-
+from datetime import date
+from dateutil.relativedelta import relativedelta  # pip install python-dateutil
 
 def get_data_from_api():
 	# Setup the Open-Meteo API client with cache and retry on error
 	cache_session = requests_cache.CachedSession('.cache', expire_after = -1)
 	retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 	openmeteo = openmeteo_requests.Client(session = retry_session)
-
+	
 	# Make sure all required weather variables are listed here
 	# The order of variables in hourly or daily is important to assign them correctly below
 	url = "https://archive-api.open-meteo.com/v1/archive"
 	params = {
 		"latitude": 51.26,
 		"longitude": 7.15,
-		"start_date": "2025-01-01",
-		"end_date": "2025-03-06",
+		"start_date": date.today() - relativedelta(months=3),
+		"end_date": date.today(),
 		"hourly": ["temperature_2m", "relative_humidity_2m", "precipitation", "weather_code", "cloud_cover", "wind_speed_100m"],
 		"timezone": "Europe/Berlin"
 	}
@@ -53,3 +54,6 @@ def get_data_from_api():
 
 	df = pd.DataFrame(data = hourly_data)
 	return df
+
+if __name__ == "__main__":
+	print(get_data_from_api())
