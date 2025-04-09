@@ -15,8 +15,8 @@ renamed as (
         precipitation,
         weather_code,
         cloud_cover,
-        wind_speed_100m
-        
+        wind_speed_100m,
+        {{ get_weathercode_description("weather_code") }} as weathercode_description
     from source
 
 )
