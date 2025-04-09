@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: staging
+    database: dataengineering-455510
+    schema: weather_dataset_0
+    
+    tables:
+      - name: table0
+      
