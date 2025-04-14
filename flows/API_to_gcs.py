@@ -2,7 +2,7 @@
 # coding: utf-8
 import argparse
 import pandas as pd
-import weather_API
+import weather_API as weather_API
 
 from sqlalchemy import create_engine
 from prefect import flow, task
@@ -57,7 +57,7 @@ def store_data(df, table_name):
 @task()
 def store_local(df):
 	"""store dataframe locally as parquet file"""
-	path = Path(f"data/data.parquet")
+	path = Path(f"../data/data.parquet")
 	df.to_parquet(path, compression = "gzip")
 	return path
 
