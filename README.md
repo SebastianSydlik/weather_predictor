@@ -1,20 +1,28 @@
-# weather_predictor
-This project serves as the Capstone project for the Data Engineering Zoomcamp 2025. 
+# 🌦️ Weather Predictor
 
-Problem:
-Weather prediction is a non-trivial process, that is based on measuring various parameters and predicting their further propagation into neighouring regions using physical formulas. While this has proven reliable in the short term, predicting the weather for the next 1-3 days, the weather predictions beyond that still remain relatively unreliable. However modern AI tools have improved that situation. One especially useful tool is the Long Short Term Memory (LSTM) recurrent neural network. 
-A prerequisite for using this tool for weather prediction is a well maintained and up to date database. 
+This repository contains the **Capstone Project** for the **Data Engineering Zoomcamp 2025**.
 
-Dataset creation and used technologies:
-To create such a database for the city Wuppertal in Germany, I set up the following pipeline, starting from the website open-meteo.com, which offers a free API to download past weather data:
+## 🧩 Problem Statement
 
-API -> local storage in Parquet
-local storage in Parquet -> Datalake (Google Cloud Storage)
-Datalake -> Datawarehouse (BigQuery)
-Data transformation from and to BigQuery (dbt)
-Data visualization (Google Looker Studio)
+Weather prediction is a complex and non-trivial task. Traditional methods rely on physical models that calculate how atmospheric conditions propagate into neighboring regions. These models are generally reliable for **short-term forecasts** (1–3 days), but accuracy significantly decreases for longer timeframes.
 
-The pipelines are run in batch mode using Prefect, which is also used for Workflow Orchestration. 
+Recent advances in **Artificial Intelligence**, especially **Recurrent Neural Networks (RNNs)** like **Long Short-Term Memory (LSTM)** networks, have shown promise in extending the reliability of weather forecasting. However, using such models effectively requires a **clean, well-maintained, and up-to-date database** of historical weather data.
 
-Outlook:
-In the future I will use this is as a basis to use LSTM for weather prediction. Additionally to use only the data for Wuppertal, I will then also add readouts from citys that are 200 km north, south, east and west of Wuppertal, which should substantially improve the performance of the LSTM in predicting the weather in Wuppertal. 
+## 🛠️ Dataset Creation & Technologies Used
+
+This project focuses on creating such a dataset and setting up the corresponding **data pipeline** for the city of **Wuppertal, Germany**. Weather data is sourced from [Open-Meteo](https://open-meteo.com/), which provides a **free API** for historical weather data.
+
+### Pipeline Overview:
+
+```text
+API (Open-Meteo) 
+   ↓ 
+Local Storage (Parquet files) 
+   ↓ 
+Datalake (Google Cloud Storage) 
+   ↓ 
+Data Warehouse (BigQuery) 
+   ↓ 
+Data Transformations (dbt) 
+   ↓ 
+Data Visualization (Google Looker Studio)
