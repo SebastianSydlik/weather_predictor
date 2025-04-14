@@ -1,0 +1,35 @@
+{% macro get_weathercode_description(weather_code) -%}
+
+    case cast({{ weather_code }} as integer)
+        when 0 then 'Clear sky'
+        when 1 then 'Mainly clear'
+        when 2 then 'Partly cloudy'
+        when 3 then 'Overcast'
+        when 45 then 'Fog'
+        when 48 then 'Fog'
+        when 51 then 'Drizzle'
+        when 53 then 'Drizzle'
+        when 55 then 'Drizzle'
+        when 56 then 'Drizzle'
+        when 57 then 'Drizzle'
+        when 61 then 'Rain'
+        when 63 then 'Rain'
+        when 65 then 'Rain'
+        when 80 then 'Rain'
+        when 81 then 'Rain'
+        when 82 then 'Rain'
+        when 66 then 'Freezing Rain'
+        when 67 then 'Freezing Rain'
+        when 71 then 'Snow fall'
+        when 73 then 'Snow fall'
+        when 75 then 'Snow fall'
+        when 77 then 'Snow fall'
+        when 85 then 'Snow fall'
+        when 86 then 'Snow fall'
+        when 95 then 'Thunderstorm'
+        when 96 then 'Thunderstorm'
+        when 99 then 'Thunderstorm'
+        else 'EMPTY'
+    end
+
+{%- endmacro %}
