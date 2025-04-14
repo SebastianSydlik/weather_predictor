@@ -26,3 +26,19 @@ Data Warehouse (BigQuery)
 Data Transformations (dbt) 
    ↓ 
 Data Visualization (Google Looker Studio)
+
+```
+### Tools
+Prefect is used to orchestrate batch processing workflows.
+
+Google Cloud Platform handles scalable data storage and transformation.
+
+dbt (data build tool) enables modular and testable SQL transformations.
+
+Looker Studio is used to create insightful visualizations of the collected data.
+
+## Outlook
+
+The next step of the project involves training an LSTM model using this curated dataset to predict future weather in Wuppertal.
+
+To enhance the model’s performance, I plan to incorporate data from cities approximately 200 km north, south, east, and west of Wuppertal. This spatial context should provide the LSTM with better insights into weather systems moving into the region, thereby improving forecast accuracy.
