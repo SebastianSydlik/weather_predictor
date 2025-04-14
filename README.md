@@ -35,7 +35,7 @@ Google Cloud Platform handles scalable data storage and transformation.
 
 dbt (data build tool) enables modular and testable SQL transformations.
 
-Looker Studio is used to create insightful visualizations of the collected data.
+Looker Studio is used to create insightful visualizations of the collected data (see 'Screenshot Google Looker Studio.png').
 
 Pipenv is used to create a virtual environment.
 
