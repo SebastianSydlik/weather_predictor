@@ -39,6 +39,8 @@ Looker Studio is used to create insightful visualizations of the collected data.
 
 Pipenv is used to create a virtual environment.
 
+Prefect and the local database (PostgreSQL with PGAdmin) are run using docker compose.
+
 ## Outlook
 
 The next step of the project involves training an LSTM model using this curated dataset to predict future weather in Wuppertal.
