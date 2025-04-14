@@ -1,5 +1,16 @@
-###all commands in bash
+###Commands to run the files in the repo
+#all commands in bash
 
+# docker-compose commands; note that prefect takes about 10s to start up -  
+# hence initially the webpage will show an error, although the port is already opened.
+docker compose up -d
+
+python ./flows/API_to_gcs.py
+python ./flows/gcs_to_BigQuery.py
+
+docker compose down -v
+
+###Other helpful commands (also in bash)
 #listing docker networks
 docker network ls
 
@@ -10,8 +21,6 @@ docker ps
 docker rm pg-network
 
 #starting postgres from docker
-    #including mounting using -v
-
 docker run -it \
     -e POSTGRES_USER="root" \
     -e POSTGRES_PASSWORD="root" \
@@ -72,13 +81,6 @@ python get_data.py \
     --db=weather \
     --table_name=weather_data
 
-#running the get_data.py ingestion script after addition of prefect block
-#note tha the block needs to be defined within the prefect ui. Also note that
-#while prefect in docker requires asyncpg to communicate with its internal
-#database, it requires psycopg2 in the block to communicate with postgresql.
-python get_data.py \
-    --table_name=weather_data
-
 # dockerize ingestion script
 docker build -t weather_ingest:v001 .
 docker run -it \
@@ -91,10 +93,12 @@ docker run -it \
     --db=weather \
     --table_name=weather_data
 
-# docker-compose commands;note that prefect takes about 10s to start up. 
-# initially the webpage will show an error, althogh the port is already opened.
-docker compose up -d
-docker compose down -v
+#running the get_data.py ingestion script after addition of prefect block
+#note that the block needs to be defined within the prefect ui. Also note that
+#while prefect in docker requires asyncpg to communicate with its internal
+#database, it requires psycopg2 in the block to communicate with postgresql.
+python get_data.py \
+    --table_name=weather_data
 
 #shorten bash path prompt
 export PS1=">"
@@ -109,3 +113,7 @@ netstat -tulnp | grep 4200
 
 #displaying current prefect settings (helpful to see variables that can be set; must be called from within prefect container if it is running via docker)
 prefect config view --show-defaults
+
+#dbt
+1.initialize the project
+2.dbt run
