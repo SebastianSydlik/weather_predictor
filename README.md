@@ -37,6 +37,8 @@ dbt (data build tool) enables modular and testable SQL transformations.
 
 Looker Studio is used to create insightful visualizations of the collected data.
 
+Pipenv is used to create a virtual environment.
+
 ## Outlook
 
 The next step of the project involves training an LSTM model using this curated dataset to predict future weather in Wuppertal.
