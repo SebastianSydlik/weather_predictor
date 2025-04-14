@@ -41,6 +41,11 @@ Pipenv is used to create a virtual environment.
 
 Prefect and the local database (PostgreSQL with PGAdmin) are run using docker compose.
 
+## Running the code
+Create a virtual environment with the packages specified in the pipfile. Then in bash run 'docker compose up -d', which will set up prefect, postgres and pgadmin. After 10s the prefect ui should be accessible on your ports. Then run python ./flows/API_to_gcs.py, followed by python ./flows/gcs_to_BigQuery.py, to download and store the latest data in BigQuery. In dbt you can run dbt build --select stg_table0.sql --vars '{'is_test_run': 'false'}' to transform the data. Then open LookerStudio, choose BigQuery as datasource and create a time series chart and a pie chart.
+
+
+
 ## Outlook
 
 The next step of the project involves training an LSTM model using this curated dataset to predict future weather in Wuppertal.
