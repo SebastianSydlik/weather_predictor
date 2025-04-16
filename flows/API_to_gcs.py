@@ -11,8 +11,8 @@ from prefect_gcp.cloud_storage import GcsBucket
 from pathlib import Path
 
 @task(retries = 3)
-def extract_data():
-	df = weather_API.get_data_from_api()
+def extract_data(location: dict) -> pd.DataFrame:
+	df = weather_API.get_data_from_api(location)
 	return df
 
 @task(log_prints=True)
@@ -52,12 +52,12 @@ def check_hourly_continuity(df: pd.DataFrame, date_column: str = 'date'):
 def store_data(df, table_name):
 	connection_block = SqlAlchemyConnector.load("postgres-connector")
 	with connection_block.get_connection(begin=False) as engine: 
-		print(df.to_sql(name=f'{table_name}', con=engine, if_exists='replace'))
+		print(df.to_sql(name=f'{table_name}', con=engine, if_exists='append'))
 		
 @task()
-def store_local(df):
+def store_local(df, town):
 	"""store dataframe locally as parquet file"""
-	path = Path(f"../data/data.parquet")
+	path = Path(f"data/{town}_data.parquet")
 	df.to_parquet(path, compression = "gzip")
 	return path
 
@@ -73,8 +73,8 @@ def write_gcs(path):
 @task()
 def load_existing_gcs(path: str) -> pd.DataFrame:
     gcs_block = GcsBucket.load("gcs-connector")
-    local_path = Path("tmp/prev_data.parquet")
-    local_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure tmp/ exists
+    local_path = Path("data/prev_data.parquet")
+    local_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure data/ exists
 
     try:
         gcs_block.download_object_to_path(
@@ -94,12 +94,11 @@ def filter_new_entries(new_df: pd.DataFrame, old_df: pd.DataFrame) -> pd.DataFra
 	return new_df[~new_df['date'].isin(old_df['date'])]
 
 @task()
-def etl_web_to_postgres(params):
-	table_name = params.table_name
-	gcs_path = "data/data.parquet"
+def etl_web_to_gcs(town: str, location: dict) -> None:
+	gcs_path = Path(f"data/{town}_data.parquet")
 
 	# ETL steps
-	df_raw = extract_data()
+	df_raw = extract_data(location)
 	df_clean = transform_data(df_raw)
 	hourly_discontinuity = check_hourly_continuity(df_clean)
 	if hourly_discontinuity:
@@ -116,18 +115,23 @@ def etl_web_to_postgres(params):
 	# Proceed with storing only new data
 	df_updated = pd.concat([df_existing, df_new]).drop_duplicates(subset='date').sort_values('date')
 	
-	path = store_local(df_updated)
-	store_data(df_new, table_name)  # <- only load *new* data into DB
+	store_data(df_new, town)  # <- only load *new* data into DB
+	path = store_local(df_updated, town)
 	write_gcs(path)
 
-	
-@flow(name='ingest_Flow')
-def call_main(): 
-	parser = argparse.ArgumentParser(description='Ingest latest weather data to Postgres')
-	parser.add_argument('--table_name', help='name of the table where we will write the results to')
+@flow()
+def etl_parent_flow():
 
-	args = parser.parse_args()
-	etl_web_to_postgres(args)
+	locations = {
+		"Wuppertal": {"latitude": 51.26, "longitude": 7.15,},
+		"Bruegge": {"latitude": 51.22, "longitude": 3.22,},
+		"Groningen": {"latitude": 53.22, "longitude": 6.57,},
+		"Erfurt": {"latitude": 50.98, "longitude": 11.03,},
+		"Saarbruecken": {"latitude": 49.23, "longitude": 7.00,},
+	}
+
+	for town, location in locations.items():
+		etl_web_to_gcs(town, location)
 
 if __name__ == '__main__':
-	call_main()
+	etl_parent_flow()

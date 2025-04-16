@@ -6,7 +6,7 @@ from retry_requests import retry
 from datetime import date
 from dateutil.relativedelta import relativedelta  # pip install python-dateutil
 
-def get_data_from_api():
+def get_data_from_api(location:dict) -> pd.DataFrame:
 	# Setup the Open-Meteo API client with cache and retry on error
 	cache_session = requests_cache.CachedSession('.cache', expire_after = -1)
 	retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
@@ -15,9 +15,11 @@ def get_data_from_api():
 	# Make sure all required weather variables are listed here
 	# The order of variables in hourly or daily is important to assign them correctly below
 	url = "https://archive-api.open-meteo.com/v1/archive"
+
+	print(location.get('latitude'))
 	params = {
-		"latitude": 51.26,
-		"longitude": 7.15,
+		"latitude": location.get("latitude"),
+		"longitude": location.get("longitude"),
 		"start_date": date.today() - relativedelta(months=3),
 		"end_date": date.today(),
 		"hourly": ["temperature_2m", "relative_humidity_2m", "precipitation", "weather_code", "cloud_cover", "wind_speed_100m"],
