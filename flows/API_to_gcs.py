@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-import argparse
 import pandas as pd
 import weather_API as weather_API
 
