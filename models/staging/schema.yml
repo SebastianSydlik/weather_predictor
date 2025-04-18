@@ -6,5 +6,5 @@ sources:
     schema: weather_dataset_0
     
     tables:
-      - name: table0
+      - name: Wuppertal
       
